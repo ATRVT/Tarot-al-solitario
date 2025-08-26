@@ -1,5 +1,41 @@
-const CACHE='tarot-pwa-final2-v5'; 
-const ASSETS=["./", "./index.html", "./app.js", "./manifest.json", "./assets/icons/icon-192.png", "./assets/icons/icon-256.png", "./assets/icons/icon-512.png", "./assets/decks/noblet/00.jpg", "./assets/decks/noblet/01.jpg", "./assets/decks/noblet/02.jpg", "./assets/decks/noblet/03.jpg", "./assets/decks/noblet/04.jpg", "./assets/decks/noblet/05.jpg", "./assets/decks/noblet/06.jpg", "./assets/decks/noblet/07.jpg", "./assets/decks/noblet/08.jpg", "./assets/decks/noblet/09.jpg", "./assets/decks/noblet/10.jpg", "./assets/decks/noblet/11.jpg", "./assets/decks/noblet/12.jpg", "./assets/decks/noblet/13.jpg", "./assets/decks/noblet/14.jpg", "./assets/decks/noblet/15.jpg", "./assets/decks/noblet/16.jpg", "./assets/decks/noblet/17.jpg", "./assets/decks/noblet/18.jpg", "./assets/decks/noblet/19.jpg", "./assets/decks/noblet/20.jpg", "./assets/decks/noblet/21.jpg", "./assets/decks/noblet/22.jpg", "./assets/decks/noblet/23.jpg", "./assets/decks/noblet/24.jpg", "./assets/decks/noblet/25.jpg", "./assets/decks/noblet/26.jpg", "./assets/decks/noblet/27.jpg", "./assets/decks/noblet/28.jpg", "./assets/decks/noblet/29.jpg", "./assets/decks/noblet/30.jpg", "./assets/decks/noblet/31.jpg", "./assets/decks/noblet/32.jpg", "./assets/decks/noblet/33.jpg", "./assets/decks/noblet/34.jpg", "./assets/decks/noblet/35.jpg", "./assets/decks/noblet/36.jpg", "./assets/decks/noblet/37.jpg", "./assets/decks/noblet/38.jpg", "./assets/decks/noblet/39.jpg", "./assets/decks/noblet/40.jpg", "./assets/decks/noblet/41.jpg", "./assets/decks/noblet/42.jpg", "./assets/decks/noblet/43.jpg", "./assets/decks/noblet/44.jpg", "./assets/decks/noblet/45.jpg", "./assets/decks/noblet/46.jpg", "./assets/decks/noblet/47.jpg", "./assets/decks/noblet/48.jpg", "./assets/decks/noblet/49.jpg", "./assets/decks/noblet/50.jpg", "./assets/decks/noblet/51.jpg", "./assets/decks/noblet/52.jpg", "./assets/decks/noblet/53.jpg", "./assets/decks/noblet/54.jpg", "./assets/decks/noblet/55.jpg", "./assets/decks/noblet/56.jpg", "./assets/decks/noblet/57.jpg", "./assets/decks/noblet/58.jpg", "./assets/decks/noblet/59.jpg", "./assets/decks/noblet/60.jpg", "./assets/decks/noblet/61.jpg", "./assets/decks/noblet/62.jpg", "./assets/decks/noblet/63.jpg", "./assets/decks/noblet/64.jpg", "./assets/decks/noblet/65.jpg", "./assets/decks/noblet/66.jpg", "./assets/decks/noblet/67.jpg", "./assets/decks/noblet/68.jpg", "./assets/decks/noblet/69.jpg", "./assets/decks/noblet/70.jpg", "./assets/decks/noblet/71.jpg", "./assets/decks/noblet/72.jpg", "./assets/decks/noblet/73.jpg", "./assets/decks/noblet/74.jpg", "./assets/decks/noblet/75.jpg", "./assets/decks/noblet/76.jpg", "./assets/decks/noblet/77.jpg"];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)))});
-self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim())});
-self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
+// sw.js — v6
+const CACHE = 'tarot-pwa-v6';
+const ASSETS = [
+  './','./index.html','./app.js','./manifest.json',
+  './assets/icons/icon-192.png','./assets/icons/icon-256.png','./assets/icons/icon-512.png'
+  // Si precacheas cartas demo, añade sus rutas aquí.
+];
+
+self.addEventListener('install', (e) => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+});
+
+self.addEventListener('activate', (e) => {
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.map(k => k !== CACHE && caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
+
+// Network-first para index.html (y raíz), cache-first para el resto
+self.addEventListener('fetch', (e) => {
+  const url = new URL(e.request.url);
+  const isIndex = url.pathname === '/' || url.pathname.endsWith('/index.html');
+  if (isIndex) {
+    e.respondWith((async () => {
+      try {
+        const fresh = await fetch(e.request, { cache: 'no-store' });
+        const cache = await caches.open(CACHE);
+        cache.put(e.request, fresh.clone());
+        return fresh;
+      } catch {
+        const cached = await caches.match(e.request);
+        return cached || caches.match('./index.html');
+      }
+    })());
+    return;
+  }
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+});
