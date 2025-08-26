@@ -1,6 +1,6 @@
 // sw.js — PWA para Tarot (network-first en index.html)
 // Sube este nombre para forzar actualización en móviles:
-const CACHE = 'tarot-pwa-v15';
+const CACHE = 'tarot-pwa-v17';
 
 // Archivos básicos a precachear (NO metemos las cartas para no inflar el caché)
 const ASSETS = [
