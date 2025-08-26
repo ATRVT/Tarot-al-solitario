@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tarot — Espejo Ciego</title>
-  <link rel="manifest" href="manifest.json">
-  <!-- CSS con estilo minimal y botón verde -->
+  <link rel="manifest" href="manifest.json" />
   <style>
     :root{
       --bg:#0c0c0f; --panel:#141418; --text:#eaeaec; --muted:#a5a7ad;
@@ -13,34 +12,75 @@
       --ring:#3b82f6; --shadow:0 6px 18px rgba(0,0,0,.35);
       --card-shadow:0 10px 24px rgba(0,0,0,.45);
       --success:#16a34a; --success-h:#15803d;
+      --secondary:#262a33; --secondary-h:#2d313b;
     }
+
+    /* Base */
+    *{box-sizing:border-box}
     body{margin:0; background:var(--bg); color:var(--text);
-         font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-    header{padding:1em; background:#000; position:sticky; top:0; z-index:50}
-    h1{margin:0; font-size:1.2em}
+         font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+    header{padding:1rem; background:#000; position:sticky; top:0; z-index:50}
+    h1{margin:0; font-size:1.2rem}
     main{padding:16px; max-width:1100px; margin:0 auto}
     footer{color:var(--muted); text-align:center; font-size:.85rem; padding:16px}
-    .toolbar{display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center; margin-bottom:12px}
+
+    /* Toolbars */
+    .toolbar{display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center}
+    .toolbar.top{margin-bottom:12px}
+    .toolbar.bottom{margin-top:16px; opacity:.95}
+
+    /* Controles (select & botones base por ID para no romper app.js) */
     select, button{
       appearance:none; border:1px solid var(--pill-b); background:var(--pill);
-      color:var(--text); padding:10px 14px; border-radius:9999px;
-      font-size:1rem; line-height:1; box-shadow:var(--shadow); transition:.15s ease;
+      color:var(--text); padding:10px 16px; border-radius:9999px;
+      font-size:1rem; line-height:1; box-shadow:var(--shadow); transition:.15s ease; cursor:pointer;
     }
     select:hover, button:hover{background:var(--pill-h); transform:translateY(-1px)}
     select:focus, button:focus{outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent)}
     button:active{transform:translateY(0)}
-    #btnDraw{background:var(--success); border-color:color-mix(in srgb, var(--success) 60%, black);
-             color:#fff; font-weight:700}
+
+    /* Botón principal (Nueva tirada) */
+    #btnDraw{
+      background:var(--success);
+      border:1px solid color-mix(in srgb, var(--success) 60%, black);
+      color:#fff; font-weight:700;
+    }
     #btnDraw:hover{background:var(--success-h)}
+
+    /* Botón Revelar (neutro destacado) */
+    #btnReveal{
+      background:#2f3340; border-color:#3a3f4e; color:#fff;
+    }
+    #btnReveal:hover{background:#383c4b}
+
+    /* Botones inferiores (secundarios) */
+    #btnSave,#btnHistory,#btnEdit,#btnExport{
+      background:var(--secondary); border-color:#303443; color:#cfd1d7;
+    }
+    #btnSave:hover,#btnHistory:hover,#btnEdit:hover,#btnExport:hover{
+      background:var(--secondary-h);
+    }
+
+    /* Cartas */
     #cardsWrap{margin:14px auto 18px; max-width:980px}
     .row.line5{display:flex; justify-content:center; gap:10px}
     .row.line5 .card{flex:1; max-width:18%}
     .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:680px; margin:auto}
     .card img{width:100%; display:block; border-radius:14px; box-shadow:var(--card-shadow)}
+
+    /* Pregunta y notas */
+    #question.hidden{filter:blur(6px); opacity:.6}
     textarea{width:100%; min-height:120px; border:1px solid var(--pill-b); background:var(--panel);
              color:var(--text); border-radius:12px; padding:12px; box-shadow:var(--shadow)}
+
+    /* Paneles */
     #historyPanel,#editor{background:var(--panel); border:1px solid var(--pill-b); border-radius:14px; padding:14px}
-    #question.hidden{filter:blur(6px); opacity:.6}
+
+    /* Responsive pequeños */
+    @media (max-width:600px){
+      .row.line5 .card{max-width:19%}
+      .grid3{max-width:95vw}
+    }
   </style>
 </head>
 <body>
@@ -50,13 +90,15 @@
 
   <main>
 
-    <!-- Selector de mazo oculto (necesario para app.js) -->
+    <!-- Elementos ocultos necesarios para app.js -->
     <select id="deck" style="display:none">
       <option value="noblet" selected>Jean Noblet (BnF)</option>
     </select>
+    <select id="qset" style="display:none"></select>
+    <button id="btnInstall" style="display:none">Instalar</button>
 
-    <!-- Toolbar superior: solo controles principales -->
-    <div class="toolbar">
+    <!-- Toolbar superior: SOLO controles principales -->
+    <div class="toolbar top">
       <label>Tirada:</label>
       <select id="spread">
         <option value="line5">Línea de 5</option>
@@ -77,13 +119,13 @@
     <div id="cardsWrap"></div>
 
     <!-- Pregunta oculta -->
-    <div>
+    <section>
       <h3>Pregunta oculta:</h3>
       <div id="question" class="hidden">···</div>
-    </div>
+    </section>
 
     <!-- Toolbar inferior: utilidades -->
-    <div class="toolbar" style="margin-top:1em;">
+    <div class="toolbar bottom">
       <button id="btnSave">Guardar nota</button>
       <button id="btnHistory">Historial</button>
       <button id="btnEdit">Editar preguntas</button>
@@ -91,30 +133,32 @@
     </div>
 
     <!-- Notas -->
-    <div>
+    <section>
       <h3>Tu interpretación (antes de ver la pregunta):</h3>
       <textarea id="notes" placeholder="Escribe aquí tu lectura libre..."></textarea>
       <div id="meta"></div>
-    </div>
+    </section>
 
     <!-- Historial -->
-    <div id="historyPanel" style="display:none">
+    <section id="historyPanel" style="display:none">
       <h3>Historial de tiradas</h3>
       <table id="histTable">
-        <thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas</th><th>Pregunta</th><th>Notas</th></tr></thead>
+        <thead>
+          <tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas</th><th>Pregunta</th><th>Notas</th></tr>
+        </thead>
         <tbody></tbody>
       </table>
-    </div>
+    </section>
 
     <!-- Editor de preguntas -->
-    <div id="editor" style="display:none">
+    <section id="editor" style="display:none">
       <h3>Editor de preguntas: <span id="edSet"></span></h3>
-      <textarea id="edText" style="width:100%;height:200px;"></textarea><br>
+      <textarea id="edText" style="width:100%;height:200px;"></textarea><br />
       <button id="edSave">Guardar</button>
       <button id="edExport">Exportar</button>
-      <input type="file" id="edImport" style="display:inline-block">
+      <input type="file" id="edImport" />
       <button id="edClose">Cerrar</button>
-    </div>
+    </section>
 
   </main>
 
