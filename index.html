@@ -1,126 +1,114 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-<title>Tarot — Espejo Ciego</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111111">
-<style>
-:root{--bg:#111;--panel:#1b1b1b;--text:#f2f2f2;--muted:#aaa;--muted2:#888;--btn:#2a2a2a;--btn-primary:#3a7bfa;--card:#222;--card-border:#333}
-*{box-sizing:border-box}
-body{font-family:-apple-system,system-ui,Arial,Roboto,sans-serif;margin:0;background:var(--bg);color:var(--text)}
-header{padding:12px 16px;background:var(--panel);position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px}
-h1{font-size:18px;margin:0}
-.badge{font-size:11px;background:#2c2c2c;color:#ddd;padding:2px 6px;border-radius:6px}
-main{padding:16px;max-width:980px;margin:0 auto}
-.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-button{padding:10px 14px;border:0;border-radius:8px;background:var(--btn);color:#fff;font-size:14px;cursor:pointer}
-button.primary{background:var(--btn-primary)}
-select{background:var(--btn);color:#fff;border-radius:8px;border:0;padding:10px}
-label{font-size:13px;color:#bbb}
-.row{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
-
-/* Línea de 5: fila única con scroll robusto */
-.row.line5{
-  display:block; width:100%;
-  white-space:nowrap; overflow-x:auto; overflow-y:hidden;
-  -webkit-overflow-scrolling:touch; padding:6px 2px;
-}
-.row.line5::-webkit-scrollbar{display:none}
-.row.line5 .card{
-  display:inline-block; vertical-align:top;
-  width:120px; height:207px; margin-right:8px; /* simula gap */
-}
-
-/* 3×3 real (para tablero) */
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;justify-items:center}
-
-/* Carta base */
-.card{width:140px;height:242px;background:var(--card);border-radius:16px;overflow:hidden;border:1px solid var(--card-border);display:flex;align-items:center;justify-content:center}
-@media (max-width:480px){ .grid3 .card{width:120px;height:207px} }
-.card img{width:100%;height:100%;object-fit:cover}
-
-.panel{background:var(--panel);border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-top:12px}
-textarea{width:100%;min-height:120px;background:#0f0f0f;color:var(--text);border:1px solid #333;border-radius:8px;padding:10px}
-.meta{font-size:12px;color:var(--muted);margin-top:6px}
-.question.hidden{filter:blur(8px)}
-.footer-note{font-size:12px;color:var(--muted2);margin-top:16px}
-.table{width:100%;border-collapse:collapse}
-.table th,.table td{border:1px solid #2a2a2a;padding:6px;font-size:12px}
-#editor{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);}
-#editor .box{background:#151515;border:1px solid #2b2b2b;border-radius:12px;max-width:900px;margin:4vh auto;padding:16px}
-#editor textarea{min-height:180px}
-.small{font-size:12px;color:#999}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarot — Espejo Ciego</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body { background:#111; color:#eee; font-family:sans-serif; margin:0; padding:0; }
+    header { padding:1em; background:#000; }
+    h1 { margin:0; font-size:1.2em; }
+    select, button, textarea { margin:0.2em; padding:0.4em; font-size:1em; }
+    button { cursor:pointer; }
+    #cardsWrap { margin:1em auto; max-width:90%; }
+    .row.line5 { display:flex; justify-content:center; gap:0.5em; }
+    .row.line5 .card { flex:1; max-width:18%; }
+    .row.line5 img { width:100%; border-radius:8px; }
+    .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5em; max-width:600px; margin:auto; }
+    .grid3 .card img { width:100%; border-radius:8px; }
+    #question.hidden { filter:blur(6px); color:#666; }
+    #notes { width:100%; min-height:80px; }
+    #historyPanel { display:none; margin:1em; padding:1em; background:#222; border-radius:8px; }
+    #editor { display:none; margin:1em; padding:1em; background:#222; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; }
+    td, th { border:1px solid #444; padding:4px; }
+    footer { text-align:center; font-size:0.8em; color:#999; padding:1em; }
+  </style>
 </head>
 <body>
-<header>
-  <h1>Tarot — Espejo Ciego</h1>
-  <span class="badge">v6</span>
-</header>
+  <header>
+    <h1>Tarot — Espejo Ciego <span id="ver">v6</span></h1>
+  </header>
 
-<main>
-  <div class="controls">
-    <!-- <label for="deck">Mazo:</label>
-<select id="deck"></select> -->
-    <label>Preguntas:</label><select id="qset"></select>
-    <label>Tirada:</label>
-    <select id="spread">
-      <option value="line5">Línea de 5</option>
-      <option value="grid3">Tablero 3×3</option>
+  <main style="padding:1em;">
+
+    <!-- SELECTOR DE MAZO OCULTO (necesario para app.js) -->
+    <select id="deck" style="display:none">
+      <option value="noblet" selected>Jean Noblet (BnF)</option>
     </select>
-    <label>Cartas:</label>
-    <select id="scope">
-      <option value="majors">Solo triunfos</option>
-      <option value="full" selected>Mazo completo (78)</option>
-    </select>
-    <button id="btnDraw" class="primary">Nueva tirada</button>
-    <button id="btnReveal">Revelar pregunta</button>
-    <button id="btnSave">Guardar nota</button>
-    <button id="btnHistory">Historial</button>
-    <button id="btnEdit">Editar preguntas</button>
-    <button id="btnInstall">Instalar</button>
-  </div>
 
-  <div class="panel"><div id="cardsWrap"><div class="row line5" id="row"></div></div></div>
+    <!-- Controles principales -->
+    <div>
+      <label>Preguntas:</label>
+      <select id="qset"></select>
 
-  <div class="panel">
-    <strong>Tu interpretación (antes de ver la pregunta):</strong>
-    <textarea id="notes" placeholder="Escribe aquí tu lectura libre..."></textarea>
-    <div class="meta" id="meta"></div>
-  </div>
+      <label>Tirada:</label>
+      <select id="spread">
+        <option value="line5">Línea de 5</option>
+        <option value="grid3">Tablero 3×3</option>
+      </select>
 
-  <div class="panel">
-    <strong>Pregunta oculta:</strong>
-    <p id="question" class="question hidden">···</p>
-  </div>
+      <label>Cartas:</label>
+      <select id="scope">
+        <option value="majors">Solo triunfos</option>
+        <option value="full" selected>Mazo completo</option>
+      </select>
 
-  <div id="historyPanel" class="panel" style="display:none">
-    <strong>Historial de tiradas</strong>
-    <div class="meta">Se guarda en tu navegador. Exporta a CSV cuando quieras.</div>
-    <table class="table" id="histTable"><thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas (IDs)</th><th>Pregunta</th><th>Notas</th></tr></thead><tbody></tbody></table>
-    <button id="btnExport">Exportar CSV</button>
-  </div>
+      <button id="btnDraw">Nueva tirada</button>
+      <button id="btnReveal">Revelar pregunta</button>
+      <button id="btnSave">Guardar nota</button>
+      <button id="btnHistory">Historial</button>
+    </div>
 
-  <p class="footer-note">PWA instalable (offline). Mazos: Noblet (demo), Rosenwald, Visconti-Sforza y Budapest. Editor de preguntas integrado.</p>
-</main>
+    <!-- Botones adicionales -->
+    <div>
+      <button id="btnEdit">Editar preguntas</button>
+      <button id="btnInstall" style="display:none">Instalar</button>
+      <button id="btnExport">Exportar historial</button>
+    </div>
 
-<div id="editor">
-  <div class="box">
-    <h3>Editor de preguntas</h3>
-    <div class="small">Editando set: <strong id="edSet"></strong>. Una por línea. Se guarda en este navegador.</div>
-    <textarea id="edText"></textarea>
-    <div class="small">Acciones:</div>
-    <div class="controls" style="margin-top:8px">
-      <button id="edSave" class="primary">Guardar cambios</button>
-      <button id="edExport">Exportar JSON</button>
-      <input type="file" id="edImport" accept="application/json">
+    <!-- Cartas -->
+    <div id="cardsWrap"></div>
+
+    <!-- Notas -->
+    <div>
+      <h3>Tu interpretación (antes de ver la pregunta):</h3>
+      <textarea id="notes" placeholder="Escribe aquí tu lectura libre..."></textarea>
+      <div id="meta"></div>
+    </div>
+
+    <!-- Pregunta oculta -->
+    <div>
+      <h3>Pregunta oculta:</h3>
+      <div id="question" class="hidden">···</div>
+    </div>
+
+    <!-- Historial -->
+    <div id="historyPanel">
+      <h3>Historial de tiradas</h3>
+      <table id="histTable">
+        <thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas</th><th>Pregunta</th><th>Notas</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Editor de preguntas -->
+    <div id="editor">
+      <h3>Editor de preguntas: <span id="edSet"></span></h3>
+      <textarea id="edText" style="width:100%;height:200px;"></textarea><br>
+      <button id="edSave">Guardar</button>
+      <button id="edExport">Exportar</button>
+      <input type="file" id="edImport" style="display:inline-block">
       <button id="edClose">Cerrar</button>
     </div>
-  </div>
-</div>
 
-<script src="app.js"></script>
+  </main>
+
+  <footer>
+    PWA instalable (offline). Mazo: Jean Noblet (BnF). Editor de preguntas integrado.
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
