@@ -18,8 +18,19 @@ select{background:#2a2a2a;color:#fff;border-radius:8px;border:0;padding:10px}
 label{font-size:13px;color:#bbb}
 .row{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
 /* Línea de 5 con scroll lateral */
-.row.line5{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px}
+.row.line5{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:6px;
+}
 .row.line5::-webkit-scrollbar{display:none}
+/* Forzar que las cartas se mantengan en fila y no se apilen */
+.row.line5 .card{
+  flex:0 0 auto;
+  width:120px;
+}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;justify-items:center}
 .card{width:140px;height:242px;background:#222;border-radius:16px;overflow:hidden;border:1px solid #333;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 @media (max-width:480px){ .card{width:120px;height:207px} }
@@ -35,22 +46,6 @@ textarea{width:100%;min-height:120px;background:#0f0f0f;color:#f2f2f2;border:1px
 #editor .box{background:#151515;border:1px solid #2b2b2b;border-radius:12px;max-width:900px;margin:4vh auto;padding:16px}
 #editor textarea{min-height:180px}
 .small{font-size:12px;color:#999}
-/* Forzar que la línea de 5 se vea en scroll horizontal en móviles */
-.row.line5{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  padding-bottom:6px;
-}
-.row.line5::-webkit-scrollbar{display:none}
-
-/* Ajuste del ancho de cartas en scroll horizontal */
-.row.line5 .card{
-  flex:0 0 auto;
-  width:120px;
-}
-
 </style>
 </head>
 <body>
@@ -89,7 +84,7 @@ textarea{width:100%;min-height:120px;background:#0f0f0f;color:#f2f2f2;border:1px
     <button id="btnExport">Exportar CSV</button>
   </div>
 
-  <p class="footer-note">PWA instalable (offline). Mazos: Noblet (demo incluido), Rosenwald, Visconti‑Sforza y Budapest (añade 00.jpg…77.jpg). Editor de preguntas integrado.</p>
+  <p class="footer-note">PWA instalable (offline). Mazos: Noblet (demo incluido), Rosenwald, Visconti-Sforza y Budapest (añade 00.jpg…77.jpg). Editor de preguntas integrado.</p>
 </main>
 
 <div id="editor">
