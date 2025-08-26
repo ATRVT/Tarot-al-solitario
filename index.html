@@ -35,6 +35,22 @@ textarea{width:100%;min-height:120px;background:#0f0f0f;color:#f2f2f2;border:1px
 #editor .box{background:#151515;border:1px solid #2b2b2b;border-radius:12px;max-width:900px;margin:4vh auto;padding:16px}
 #editor textarea{min-height:180px}
 .small{font-size:12px;color:#999}
+/* Forzar que la línea de 5 se vea en scroll horizontal en móviles */
+.row.line5{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:6px;
+}
+.row.line5::-webkit-scrollbar{display:none}
+
+/* Ajuste del ancho de cartas en scroll horizontal */
+.row.line5 .card{
+  flex:0 0 auto;
+  width:120px;
+}
+
 </style>
 </head>
 <body>
