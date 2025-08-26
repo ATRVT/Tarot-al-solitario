@@ -6,8 +6,12 @@
 <title>Tarot — Espejo Ciego</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#111111">
+
 <style>
-:root{--bg:#111;--panel:#1b1b1b;--text:#f2f2f2;--muted:#aaa;--muted2:#888;--btn:#2a2a2a;--btn-primary:#3a7bfa;--card:#222;--card-border:#333}
+:root{
+  --bg:#111; --panel:#1b1b1b; --text:#f2f2f2; --muted:#aaa; --muted2:#888;
+  --btn:#2a2a2a; --btn-primary:#3a7bfa; --card:#222; --card-border:#333;
+}
 *{box-sizing:border-box}
 html,body{height:100%}
 body{font-family:-apple-system,system-ui,Arial,"Segoe UI",Roboto,sans-serif;margin:0;background:var(--bg);color:var(--text)}
@@ -22,43 +26,45 @@ button.primary{background:var(--btn-primary)}
 select{background:var(--btn);color:#fff;border-radius:8px;border:0;padding:10px}
 label{font-size:13px;color:#bbb}
 
-/* Fila genérica (puede cortar línea) */
+/* Fila genérica (para otros layouts) */
 .row{display:flex;gap:8px;justify-content:center;margin:12px 0;flex-wrap:wrap}
 
-/* ===== Línea de 5: SIEMPRE una sola fila con scroll ===== */
+/* ===== LÍNEA DE 5: método antirrotura para iOS/Android =====
+   Usamos white-space:nowrap (contenedor en bloque) + hijos inline-block
+   para forzar una fila única con scroll horizontal. */
 .row.line5{
-  display:flex;
+  display:block;                 /* en vez de flex */
   width:100%;
-  gap:8px;
-  justify-content:flex-start;
-  flex-wrap:nowrap !important;      /* <- fuerza fila única */
-  overflow-x:auto;
+  white-space:nowrap;            /* TODO en una línea */
+  overflow-x:auto;               /* scroll lateral */
   overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
-  padding-bottom:6px;
-  scroll-snap-type:x proximity;
+  padding: 6px 2px 6px 2px;
 }
 .row.line5::-webkit-scrollbar{display:none}
 
-/* Cartas dentro de la línea de 5: ancho fijo y sin encoger */
+/* Las cartas en la línea: inline-block con ancho fijo */
 .row.line5 .card{
-  flex:0 0 auto !important;
-  width:120px !important;
-  min-width:120px !important;
-  scroll-snap-align:start;
+  display:inline-block;          /* clave del patrón nowrap */
+  vertical-align:top;
+  width:120px;                   /* ancho fijo móvil */
+  height:207px;                  /* altura proporcional móvil */
+  margin-right:8px;              /* simula gap */
 }
 
-/* Tablero 3×3 */
+/* Tablero 3×3 (se mantiene con grid) */
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;justify-items:center}
 
-/* Carta (tamaño base) */
+/* Carta base (para grid3 y pantallas grandes) */
 .card{
   width:140px;height:242px;background:var(--card);border-radius:16px;
   overflow:hidden;border:1px solid var(--card-border);
-  display:flex;align-items:center;justify-content:center;flex:0 0 auto
+  display:flex;align-items:center;justify-content:center;
 }
-/* Reducción general en pantallas chicas (no afecta a line5 por reglas específicas) */
-@media (max-width:480px){ .card{width:120px;height:207px} }
+/* En pantallas pequeñas, reducimos tamaño general (la línea ya tiene su propio tamaño fijo) */
+@media (max-width:480px){
+  .grid3 .card{width:120px;height:207px}
+}
 .card img{width:100%;height:100%;object-fit:cover}
 
 /* Paneles y texto */
@@ -77,8 +83,10 @@ textarea{width:100%;min-height:120px;background:#0f0f0f;color:var(--text);border
 .small{font-size:12px;color:#999}
 </style>
 </head>
+
 <body>
 <header><h1>Tarot — Espejo Ciego</h1></header>
+
 <main>
   <div class="controls">
     <label>Mazo:</label><select id="deck"></select>
@@ -122,11 +130,16 @@ textarea{width:100%;min-height:120px;background:#0f0f0f;color:var(--text);border
   <div id="historyPanel" class="panel" style="display:none">
     <strong>Historial de tiradas</strong>
     <div class="meta">Se guarda en tu navegador. Exporta a CSV cuando quieras.</div>
-    <table class="table" id="histTable"><thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas (IDs)</th><th>Pregunta</th><th>Notas</th></tr></thead><tbody></tbody></table>
+    <table class="table" id="histTable">
+      <thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas (IDs)</th><th>Pregunta</th><th>Notas</th></tr></thead>
+      <tbody></tbody>
+    </table>
     <button id="btnExport">Exportar CSV</button>
   </div>
 
-  <p class="footer-note">PWA instalable (offline). Mazos: Noblet (demo), Rosenwald, Visconti-Sforza, Budapest. Editor de preguntas integrado.</p>
+  <p class="footer-note">
+    PWA instalable (offline). Mazos: Noblet (demo), Rosenwald, Visconti-Sforza y Budapest. Editor de preguntas integrado.
+  </p>
 </main>
 
 <div id="editor">
