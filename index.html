@@ -5,79 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tarot — Espejo Ciego</title>
   <link rel="manifest" href="manifest.json">
- <style>
-  :root{
-    --bg:#0c0c0f; --panel:#141418; --text:#eaeaec; --muted:#a5a7ad;
-    --pill:#1b1d22; --pill-b:#2a2d34; --pill-h:#23262d;
-    --ring:#3b82f6; --shadow:0 6px 18px rgba(0,0,0,.35);
-    --card-shadow:0 10px 24px rgba(0,0,0,.45);
-    --success:#16a34a; --success-h:#15803d;
-  }
-
-  /* Base */
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0; background:var(--bg); color:var(--text);
-       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
-  header{position:sticky; top:0; z-index:50; background:#000;
-         padding:calc(8px + env(safe-area-inset-top)) 16px 10px}
-  h1{margin:0; font-size:1.2rem; letter-spacing:.2px}
-
-  main{padding:16px; padding-bottom:28px; max-width:1100px; margin:0 auto}
-  footer{color:var(--muted); text-align:center; font-size:.85rem; padding:16px}
-
-  /* Toolbar */
-  .toolbar{display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center; margin-bottom:12px}
-  label{color:var(--muted); font-size:.95rem; margin-right:4px}
-
-  /* Pills (selects y botones) */
-  select, button{
-    appearance:none; border:1px solid var(--pill-b); background:var(--pill);
-    color:var(--text); padding:10px 14px; border-radius:9999px;
-    font-size:1rem; line-height:1; box-shadow:var(--shadow); transition:.15s ease;
-  }
-  select:hover, button:hover{background:var(--pill-h); transform:translateY(-1px)}
-  select:focus, button:focus{outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent)}
-  button:active{transform:translateY(0)}
-
-  /* Botón verde “Nueva tirada” */
-  #btnDraw{background:var(--success); border-color:color-mix(in srgb, var(--success) 60%, black);
-           color:#fff; font-weight:700}
-  #btnDraw:hover{background:var(--success-h)}
-
-  /* Cartas */
-  #cardsWrap{margin:14px auto 18px; max-width:980px}
-  .row.line5{display:flex; justify-content:center; gap:10px}
-  .row.line5 .card{flex:1; max-width:18%}
-  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:680px; margin:auto}
-  .card img{width:100%; display:block; border-radius:14px; box-shadow:var(--card-shadow)}
-
-  /* Notas & paneles */
-  textarea{width:100%; min-height:120px; border:1px solid var(--pill-b); background:var(--panel);
-           color:var(--text); border-radius:12px; padding:12px; box-shadow:var(--shadow)}
-  #historyPanel,#editor{background:var(--panel); border:1px solid var(--pill-b); border-radius:14px; padding:14px}
-
-  /* Pregunta oculta (leve velo antes de revelar) */
-  #question.hidden{filter:blur(6px); opacity:.6}
-</style>
+  <!-- CSS con estilo minimal y botón verde -->
+  <style>
+    :root{
+      --bg:#0c0c0f; --panel:#141418; --text:#eaeaec; --muted:#a5a7ad;
+      --pill:#1b1d22; --pill-b:#2a2d34; --pill-h:#23262d;
+      --ring:#3b82f6; --shadow:0 6px 18px rgba(0,0,0,.35);
+      --card-shadow:0 10px 24px rgba(0,0,0,.45);
+      --success:#16a34a; --success-h:#15803d;
+    }
+    body{margin:0; background:var(--bg); color:var(--text);
+         font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    header{padding:1em; background:#000; position:sticky; top:0; z-index:50}
+    h1{margin:0; font-size:1.2em}
+    main{padding:16px; max-width:1100px; margin:0 auto}
+    footer{color:var(--muted); text-align:center; font-size:.85rem; padding:16px}
+    .toolbar{display:flex; flex-wrap:wrap; gap:10px 12px; align-items:center; margin-bottom:12px}
+    select, button{
+      appearance:none; border:1px solid var(--pill-b); background:var(--pill);
+      color:var(--text); padding:10px 14px; border-radius:9999px;
+      font-size:1rem; line-height:1; box-shadow:var(--shadow); transition:.15s ease;
+    }
+    select:hover, button:hover{background:var(--pill-h); transform:translateY(-1px)}
+    select:focus, button:focus{outline:none; box-shadow:0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent)}
+    button:active{transform:translateY(0)}
+    #btnDraw{background:var(--success); border-color:color-mix(in srgb, var(--success) 60%, black);
+             color:#fff; font-weight:700}
+    #btnDraw:hover{background:var(--success-h)}
+    #cardsWrap{margin:14px auto 18px; max-width:980px}
+    .row.line5{display:flex; justify-content:center; gap:10px}
+    .row.line5 .card{flex:1; max-width:18%}
+    .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; max-width:680px; margin:auto}
+    .card img{width:100%; display:block; border-radius:14px; box-shadow:var(--card-shadow)}
+    textarea{width:100%; min-height:120px; border:1px solid var(--pill-b); background:var(--panel);
+             color:var(--text); border-radius:12px; padding:12px; box-shadow:var(--shadow)}
+    #historyPanel,#editor{background:var(--panel); border:1px solid var(--pill-b); border-radius:14px; padding:14px}
+    #question.hidden{filter:blur(6px); opacity:.6}
+  </style>
 </head>
 <body>
   <header>
-    <h1>Tarot — Espejo Ciego <span id="ver">v6</span></h1>
+    <h1>Tarot — Espejo Ciego</h1>
   </header>
 
-  <main style="padding:1em;">
+  <main>
 
-    <!-- SELECTOR DE MAZO OCULTO (necesario para app.js) -->
+    <!-- Selector de mazo oculto (necesario para app.js) -->
     <select id="deck" style="display:none">
       <option value="noblet" selected>Jean Noblet (BnF)</option>
     </select>
 
-    <!-- Controles principales -->
-    <div>
-      <label>Preguntas:</label>
-      <select id="qset"></select>
-
+    <!-- Toolbar superior: solo controles principales -->
+    <div class="toolbar">
       <label>Tirada:</label>
       <select id="spread">
         <option value="line5">Línea de 5</option>
@@ -92,19 +71,24 @@
 
       <button id="btnDraw">Nueva tirada</button>
       <button id="btnReveal">Revelar pregunta</button>
-      <button id="btnSave">Guardar nota</button>
-      <button id="btnHistory">Historial</button>
-    </div>
-
-    <!-- Botones adicionales -->
-    <div>
-      <button id="btnEdit">Editar preguntas</button>
-      <button id="btnInstall" style="display:none">Instalar</button>
-      <button id="btnExport">Exportar historial</button>
     </div>
 
     <!-- Cartas -->
     <div id="cardsWrap"></div>
+
+    <!-- Pregunta oculta -->
+    <div>
+      <h3>Pregunta oculta:</h3>
+      <div id="question" class="hidden">···</div>
+    </div>
+
+    <!-- Toolbar inferior: utilidades -->
+    <div class="toolbar" style="margin-top:1em;">
+      <button id="btnSave">Guardar nota</button>
+      <button id="btnHistory">Historial</button>
+      <button id="btnEdit">Editar preguntas</button>
+      <button id="btnExport">Exportar historial</button>
+    </div>
 
     <!-- Notas -->
     <div>
@@ -113,14 +97,8 @@
       <div id="meta"></div>
     </div>
 
-    <!-- Pregunta oculta -->
-    <div>
-      <h3>Pregunta oculta:</h3>
-      <div id="question" class="hidden">···</div>
-    </div>
-
     <!-- Historial -->
-    <div id="historyPanel">
+    <div id="historyPanel" style="display:none">
       <h3>Historial de tiradas</h3>
       <table id="histTable">
         <thead><tr><th>Fecha</th><th>Mazo</th><th>Tirada</th><th>Cartas</th><th>Pregunta</th><th>Notas</th></tr></thead>
@@ -129,7 +107,7 @@
     </div>
 
     <!-- Editor de preguntas -->
-    <div id="editor">
+    <div id="editor" style="display:none">
       <h3>Editor de preguntas: <span id="edSet"></span></h3>
       <textarea id="edText" style="width:100%;height:200px;"></textarea><br>
       <button id="edSave">Guardar</button>
